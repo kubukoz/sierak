@@ -9,6 +9,7 @@ import com.typesafe.config.Config
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.io.Source
 import scala.language.postfixOps
 import scala.sys.process._
 
@@ -24,7 +25,7 @@ trait Service{
   implicit val routeActorCallTimeout = Timeout(5 seconds)
 
   def getResults = Future{
-    "curl http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc" #> "/dev/null" !!
+    Source.fromURL("http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc", "iso-8859-1")
   }.map(_.length > 33787).map{
     case true => "CHYBA SĄ WYNIKI"
     case _ => "NIE MA WYNIKÓW"
