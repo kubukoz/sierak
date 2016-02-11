@@ -1,4 +1,4 @@
-name := "polskibus"
+name := "sierak"
 
 version := "1.0"
 
