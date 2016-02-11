@@ -26,7 +26,7 @@ trait Service{
 
   def getResults = Future{
     Source.fromURL("http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc", "iso-8859-1")
-  }.map(_.length > 33787).map{
+  }.map(_.length > 33792).map{
     case true => "CHYBA SĄ WYNIKI"
     case _ => "NIE MA WYNIKÓW"
   }
