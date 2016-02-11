@@ -49,7 +49,7 @@ class MailerActor(login: String, password: String) extends Actor with ActorLoggi
 
 object MailerActor {
   implicit class Addressable(name: String) {
-    def at(host: String) = new InternetAddress("%s@%s" format(name, host))
+    def at(host: String) = new InternetAddress(s"$name@$host")
   }
 
   case object Send
