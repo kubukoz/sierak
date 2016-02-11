@@ -40,8 +40,8 @@ class MailerActor(login: String, password: String) extends Actor with ActorLoggi
 
     mailer(Envelope.from(login at "gmail.com")
       .to(login at "gmail.com")
-      .subject("LELELELELEL")
-      .content(Text("wassup man"))).onSuccess {
+      .subject("Wyniki z fizy")
+      .content(Text("Są wyniki z fizy. Chyba."))).onSuccess {
       case _ => println("message delivered")
     }
   }
