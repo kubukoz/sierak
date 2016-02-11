@@ -8,15 +8,16 @@ import com.kubukoz.sierak.Tools._
 import courier.{Envelope, Mailer, Text}
 
 import scala.concurrent.duration._
+import scala.language.implicitConversions
 
-class MailerActor(login: String, password: String) extends Actor with ActorLogging {
+class MailerActor(login: String, password: String, recipients: Seq[String]) extends Actor with ActorLogging {
 
   import context.dispatcher
 
   def send: Receive = {
     case Send =>
       log.info("Sending message")
-      sendMail()
+      sendMails()
   }
 
   override def receive: Receive = {
@@ -32,25 +33,31 @@ class MailerActor(login: String, password: String) extends Actor with ActorLoggi
       }
   }
 
-  def sendMail() = {
-    val mailer = Mailer("smtp.gmail.com", 587)
+  def sendMails() = {
+    val mailer = Mailer(host = "smtp.gmail.com", port = 587)
       .auth(true)
       .as(s"$login@gmail.com", password)
       .startTtls(true)()
 
-    mailer(Envelope.from(login at "gmail.com")
-      .to(login at "gmail.com")
+    val envelope = Envelope.from(login at "gmail.com")
       .subject("Wyniki z fizy")
-      .content(Text("Są wyniki z fizy. Chyba."))).onSuccess {
-      case _ => println("message delivered")
+      .content(Text("Są wyniki z fizy. Chyba."))
+
+    recipients.foreach { recipient =>
+      mailer.apply(envelope.to(recipient)).onSuccess {
+        case _ => println(s"message delivered to $recipient")
+      }
     }
   }
 }
 
 object MailerActor {
+
   implicit class Addressable(name: String) {
-    def at(host: String) = new InternetAddress(s"$name@$host")
+    def at(host: String): InternetAddress = new InternetAddress(s"$name@$host")
   }
+
+  implicit def stringToAddress(s: String): InternetAddress = new InternetAddress(s)
 
   case object Send
 

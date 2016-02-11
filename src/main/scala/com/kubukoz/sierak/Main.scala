@@ -43,7 +43,12 @@ object Main {
       }
     }
 
-  val mailer = actorSystem.actorOf(Props(classOf[MailerActor], config.getString("mail.login"), config.getString("mail.password")))
+
+  val login = config.getString("mail.login")
+  val password = config.getString("mail.password")
+  val recipients = config.getString("mail.recipients").split(",").map(_.trim).toList
+
+  val mailer = actorSystem.actorOf(Props(classOf[MailerActor], login, password, recipients))
 
   def main(args: Array[String]): Unit = {
     mailer ! Wait
