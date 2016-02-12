@@ -1,5 +1,7 @@
 package com.kubukoz.sierak
 
+import java.text.SimpleDateFormat
+
 import akka.actor.{ActorSystem, Props}
 import akka.event.Logging
 import akka.http.scaladsl.Http
@@ -10,16 +12,24 @@ import akka.util.Timeout
 import com.kubukoz.sierak.MailerActor.Wait
 import com.kubukoz.sierak.Tools._
 import com.typesafe.config.ConfigFactory
+import play.api.libs.ws.ning.NingWSClient
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
-import scala.io.Source
 import scala.language.postfixOps
 
 object Tools {
-  def futureAreResultsAvailable(implicit ec: ExecutionContext) = Future {
-    Source.fromURL("http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc", "iso-8859-1")
-  }.map(_.length > 33792)
+  val lastModified = 1455296440000L
+
+  def futureAreResultsAvailable(implicit ec: ExecutionContext) =
+    NingWSClient().url("http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc").get().map { result =>
+      val dateString = result.header("Last-Modified")
+      val dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
+
+      val date = dateString.map(dateFormat.parse)
+
+      date.exists(_.getTime > lastModified)
+    }
 }
 
 object Main {
