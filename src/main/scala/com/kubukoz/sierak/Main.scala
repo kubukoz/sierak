@@ -21,15 +21,19 @@ import scala.language.postfixOps
 object Tools {
   val lastModified = 1455296440000L
 
-  def futureAreResultsAvailable(implicit ec: ExecutionContext) =
-    NingWSClient().url("http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc").get().map { result =>
+  def futureAreResultsAvailable(implicit ec: ExecutionContext) = {
+    val ws = NingWSClient()
+
+    ws.url("http://www.if.pw.edu.pl/~sierak/Wyniki_Is_2015-2016.doc").get().map { result =>
       val dateString = result.header("Last-Modified")
       val dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
 
       val date = dateString.map(dateFormat.parse)
 
+      ws.close()
       date.exists(_.getTime > lastModified)
     }
+  }
 }
 
 object Main {
