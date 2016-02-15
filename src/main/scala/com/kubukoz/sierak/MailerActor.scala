@@ -9,7 +9,7 @@ import courier.{Envelope, Mailer, Text}
 
 import scala.concurrent.duration._
 import scala.language.implicitConversions
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 class MailerActor(login: String, password: String, recipients: Seq[String]) extends Actor with ActorLogging {
 
@@ -46,7 +46,7 @@ class MailerActor(login: String, password: String, recipients: Seq[String]) exte
 
     mailer(envelope.to(recipients.map(stringToAddress): _*)).onComplete {
       case Success(_) => println("message delivered")
-      case _ => println("message NOT delivered")
+      case Failure(ex) => ex.printStackTrace()
     }
   }
 }
