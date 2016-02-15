@@ -43,10 +43,8 @@ class MailerActor(login: String, password: String, recipients: Seq[String]) exte
       .subject("Wyniki z fizy")
       .content(Text("Są wyniki z fizy. Chyba."))
 
-    recipients.foreach { recipient =>
-      mailer.apply(envelope.to(recipient)).onSuccess {
-        case _ => println(s"message delivered to $recipient")
-      }
+    mailer(envelope.to(recipients.map(stringToAddress):_*)).onSuccess {
+        case _ => println(s"message delivered")
     }
   }
 }
